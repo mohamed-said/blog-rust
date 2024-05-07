@@ -1,0 +1,16 @@
+services:
+  server:
+    depends_on:
+      - mongodb
+    build:
+      context: .
+      target: final
+    environment:
+      MONGODB_URI: mongodb://mongodb:27017
+    ports:
+      - 3000:3000
+
+  mongodb:
+    image: mongo
+    ports:
+      - "27017:27017"
