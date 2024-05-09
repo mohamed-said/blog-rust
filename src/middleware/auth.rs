@@ -7,8 +7,8 @@ use lazy_regex::regex_captures;
 use tower_cookies::{Cookie, Cookies};
 
 use crate::ctx::ctx::Ctx;
-use crate::routes::AUTH_TOKEN;
 use crate::error::auth_error::{AuthError, Result};
+use crate::routes::AUTH_TOKEN;
 
 pub async fn mw_ctx_resolver(
     // TODO: use this later
@@ -24,15 +24,16 @@ pub async fn mw_ctx_resolver(
     // Compute Result<Ctx>
     let result_ctx = match auth_token
         .ok_or(AuthError::NoAuthTokenCookie)
-        .and_then(parse_token) {
-            Ok ((user_id, _exp, _sign)) => {
-                // Token component validation
-                // e.g. check in the databse if the token and user_id
-                // actually correct and not malicious
-                Ok(Ctx::new(user_id))
-            }
-            Err(e) => Err(e),
-        };
+        .and_then(parse_token)
+    {
+        Ok((user_id, _exp, _sign)) => {
+            // Token component validation
+            // e.g. check in the databse if the token and user_id
+            // actually correct and not malicious
+            Ok(Ctx::new(user_id))
+        }
+        Err(e) => Err(e),
+    };
 
     // remove the cookie if any unhandled error happens
 
@@ -45,11 +46,7 @@ pub async fn mw_ctx_resolver(
     Ok(next.run(req).await)
 }
 
-pub async fn mw_require_auth(
-    ctx: Result<Ctx>,
-    req: Request,
-    next: Next,
-) -> Result<Response> {
+pub async fn mw_require_auth(ctx: Result<Ctx>, req: Request, next: Next) -> Result<Response> {
     println!("->> {:12} - {}", "MIDDLEWARE", "my_require_auth");
 
     ctx?;
@@ -58,9 +55,8 @@ pub async fn mw_require_auth(
 }
 
 fn parse_token(token: String) -> Result<(u64, String, String)> {
-    let (_, user_id, exp, signature) = regex_captures!(
-        r#"^user-(\d+)\.(.+)\.(.+)"#, &token
-    ).ok_or(AuthError::InvalidTokenFormat)?;
+    let (_, user_id, exp, signature) = regex_captures!(r#"^user-(\d+)\.(.+)\.(.+)"#, &token)
+        .ok_or(AuthError::InvalidTokenFormat)?;
 
     let user_id: u64 = user_id.parse().map_err(|_| AuthError::InvalidTokenFormat)?;
 

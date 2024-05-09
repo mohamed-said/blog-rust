@@ -1,4 +1,3 @@
-pub mod static_routes;
 pub mod article;
 pub mod login;
 

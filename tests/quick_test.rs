@@ -14,7 +14,7 @@ async fn quick_test() -> Result<()> {
         json!({
             "username":"admin",
             "password":"admin",
-        })
+        }),
     );
     req_login.await?.print().await?;
 
@@ -22,13 +22,17 @@ async fn quick_test() -> Result<()> {
         "/api/article",
         json!({
             "title": "Article ONE",
-            "body": "Hello Booooodyyyy!"})
+            "body": "Hello Booooodyyyy!"}),
     );
     req_add_article.await?.print().await?;
 
     http_client.do_get("/api/article").await?.print().await?;
 
-    http_client.do_delete("/api/article/423423423").await?.print().await?;
+    http_client
+        .do_delete("/api/article/423423423")
+        .await?
+        .print()
+        .await?;
 
     http_client.do_get("/api/article").await?.print().await?;
 

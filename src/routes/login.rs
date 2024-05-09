@@ -4,8 +4,8 @@ use serde_json::{json, Value};
 use tower_cookies::{Cookie, Cookies};
 
 use crate::{
+    error::login_error::{LoginError, Result},
     routes::AUTH_TOKEN,
-    error::login_error::{LoginError, Result}
 };
 
 #[derive(Debug, Serialize, Deserialize)]

@@ -1,46 +1,37 @@
 use axum::{
-    extract::{Path, State}, routing::{delete, post}, Json, Router
+    extract::State,
+    routing::{get, post},
+    Json, Router,
 };
+use bson::oid::ObjectId;
 
-use crate::{ctx::ctx::Ctx, models::article::{AddArticleRequest, Article, ArticleController}};
 use crate::error::article_error::Result;
+use crate::models::article::{AddArticleRequest, Article, ArticleController};
 
 pub fn routes(mc: ArticleController) -> Router {
     Router::new()
-        .route("/article", post(add_article).get(get_articles))
-        .route("/article/:id", delete(delete_article))
+        .route("/article", post(add_article))
+        .route("/list", get(get_articles))
         .with_state(mc)
 }
 
 async fn add_article(
     State(mc): State<ArticleController>,
-    ctx: Ctx,
-    Json(req): Json<AddArticleRequest>
-) -> Result<Json<Article>> {
+    Json(req): Json<AddArticleRequest>,
+) -> Result<Json<ObjectId>> {
     println!("->> {:12} - {}", "HANDLER", "add_article");
-    let article = mc.create_article(ctx, req).await?;
 
-    Ok(Json(article))
+    let added_object_id = mc.create_article(req).await?;
+
+    Ok(Json(added_object_id))
 }
 
-
-async fn get_articles (
-    State(mc): State<ArticleController>,
-    ctx: Ctx,
-) -> Result<Json<Vec<Article>>> {
+async fn get_articles(State(mc): State<ArticleController>) -> Result<Json<Vec<Article>>> {
     println!("->> {:12} - {}", "HANDLER", "get_articles");
-    let articles = mc.list_articles(ctx).await?;
+
+    let articles = mc.list_articles().await?;
+
+    println!("how many articles?: {}", &articles.len());
 
     Ok(Json(articles))
-}
-
-async fn delete_article(
-    State(mc): State<ArticleController>,
-    ctx: Ctx,
-    Path(id): Path<u64>
-) -> Result<Json<Article>> {
-    println!("->> {:12} - {}", "HANDLER", "delete_article");
-    let deleted_article = mc.delete_article(ctx, id).await?;
-
-    Ok(Json(deleted_article))
 }

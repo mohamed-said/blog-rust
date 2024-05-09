@@ -1,7 +1,6 @@
 use axum::{http::StatusCode, response::IntoResponse};
 
 use super::client_error::ClientError;
-use super::Error;
 
 pub type Result<T> = core::result::Result<T, LoginError>;
 
@@ -18,12 +17,10 @@ impl IntoResponse for LoginError {
     }
 }
 
-impl Error for LoginError {
-    fn client_status_and_error(&self) -> (StatusCode, ClientError) {
+impl LoginError {
+    fn _client_status_and_error(&self) -> (StatusCode, ClientError) {
         match self {
-            Self::LoginFail => {
-                (StatusCode::FORBIDDEN, ClientError::LOGIN_FAIL)
-            }
+            Self::LoginFail => (StatusCode::FORBIDDEN, ClientError::LOGIN_FAIL),
         }
     }
 }

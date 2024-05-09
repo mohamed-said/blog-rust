@@ -1,6 +1,6 @@
 use axum::{http::StatusCode, response::IntoResponse};
 
-use super::{Error, client_error::ClientError};
+use super::client_error::ClientError;
 
 pub type Result<T> = core::result::Result<T, AuthError>;
 
@@ -11,9 +11,10 @@ pub enum AuthError {
     CtxNotInRequestExtension,
 }
 
-impl IntoResponse for AuthError  {
+impl IntoResponse for AuthError {
     fn into_response(self) -> axum::response::Response {
         println!("->> {:12} - {self:?}", "INTO_RES");
+        println!("Hopaaaaaaa");
 
         // create a placeholder for Axum response
         let mut response = StatusCode::INTERNAL_SERVER_ERROR.into_response();
@@ -25,17 +26,18 @@ impl IntoResponse for AuthError  {
     }
 }
 
-impl Error for AuthError {
-    fn client_status_and_error(&self) -> (StatusCode, ClientError) {
+impl AuthError {
+    fn _client_status_and_error(&self) -> (StatusCode, ClientError) {
         // FIXME: remove unnecessary patterns and make sure everything is exhaustive
         #[allow(unreachable_patterns)]
         match self {
-            AuthError::NoAuthTokenCookie | AuthError::InvalidTokenFormat | AuthError::CtxNotInRequestExtension => {
-                (StatusCode::FORBIDDEN, ClientError::NO_AUTH)
-            }
-            _ => {
-                (StatusCode::INTERNAL_SERVER_ERROR, ClientError::SERVICE_ERROR)
-            }
+            AuthError::NoAuthTokenCookie
+            | AuthError::InvalidTokenFormat
+            | AuthError::CtxNotInRequestExtension => (StatusCode::FORBIDDEN, ClientError::NO_AUTH),
+            _ => (
+                StatusCode::INTERNAL_SERVER_ERROR,
+                ClientError::SERVICE_ERROR,
+            ),
         }
     }
 }

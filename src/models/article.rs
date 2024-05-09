@@ -1,20 +1,31 @@
-use std::{collections::HashMap, fmt::Display, sync::Arc};
+use std::fmt::Display;
 
-use crate::{ctx::ctx::Ctx, error::article_error::{ArticleError, Result}};
+use crate::error::article_error::{ArticleError, Result};
+use bson::{doc, oid::ObjectId, Document};
+use futures::StreamExt;
 use serde::{Deserialize, Serialize};
-use tokio::sync::Mutex;
 
 #[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct Article {
-    pub id: u64,
-    pub user_id: u64, // article creator id
+    pub _id: String,
+    pub title: String,
+    pub body: String,
+}
+
+#[derive(Debug, Clone, Deserialize, Serialize)]
+pub struct ArticleBson {
+    pub _id: ObjectId,
     pub title: String,
     pub body: String,
 }
 
 impl Display for Article {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-       write!(f, " --------- Article ---------\n\ttitle: {}\n\tbody: {}\n", self.title, &self.body)
+        write!(
+            f,
+            " --------- Article ---------\n\ttitle: {}\n\tbody: {}\n",
+            self.title, &self.body
+        )
     }
 }
 
@@ -32,57 +43,76 @@ pub struct AddArticleResponse {
 
 #[derive(Clone)]
 pub struct ArticleController {
-   articles: Arc<Mutex<HashMap<u64, Article>>>
+    db_instance: mongodb::Database,
 }
 
 impl ArticleController {
-    pub async fn new() -> Result<Self> {
-        Ok(Self {
-            articles: Arc::default()
-        })
+    pub async fn new(db_instance: mongodb::Database) -> Result<Self> {
+        Ok(Self { db_instance })
     }
 
-    pub async fn create_article(&self, ctx: Ctx, req: AddArticleRequest) -> Result<Article> {
-        let mut store = self.articles.lock().await;
+    pub async fn create_article(&self, req: AddArticleRequest) -> Result<ObjectId> {
+        let collection = self.db_instance.collection::<Document>("articles");
 
-        let id = 423423423 as u64;
+        let result = collection
+            .insert_one(
+                doc! {
+                    "title": req.title,
+                    "body": req.body,
+                },
+                None,
+            )
+            .await;
 
-        let article = Article {
-            id,
-            user_id: ctx.user_id(),
-            title: req.title,
-            body: req.body,
+        let inserted_id_bson = match result {
+            Ok(r) => r.inserted_id,
+            Err(e) => {
+                println!("Error: Insert one item failed: {:?}", e);
+                return Err(ArticleError::ArticleNotAdded);
+            }
         };
 
-        store.insert(id, article.clone());
-
-        Ok(article)
+        match inserted_id_bson.as_object_id() {
+            Some(r) => Ok(r),
+            None => {
+                println!("Error: Parsing objectId failed");
+                Err(ArticleError::ArticleNotAdded)
+            }
+        }
     }
 
-    pub async fn list_articles(&self, ctx: Ctx) -> Result<Vec<Article>> {
-        let store = self.articles.lock().await;
-
+    pub async fn list_articles(&self) -> Result<Vec<Article>> {
         let mut res: Vec<Article> = vec![];
 
-        for (&id, article) in store.iter() {
-            res.push(Article {
-                id,
-                user_id: ctx.user_id(),
-                title: article.title.clone(),
-                body: article.body.clone(),
-            });
+        let collection = self.db_instance.collection::<Document>("articles");
+
+        let mut query = collection
+            .find(None, None)
+            .await
+            .map_err(|_e| panic!("Error while listiing all articles"))
+            .unwrap();
+
+        while let Some(result) = query.next().await {
+            match result {
+                // FIXME there has to be a better and more idomatic way
+                // to deserialize the document into the corresponding type
+                Ok(doc) => {
+                    let id = doc.get_object_id("_id").unwrap().to_string();
+                    let title = doc.get_str("title").unwrap().to_string();
+                    let body = doc.get_str("body").unwrap().to_string();
+                    let article = Article {
+                        _id: id,
+                        title,
+                        body,
+                    };
+                    res.push(article);
+                }
+                Err(e) => {
+                    eprintln!("Error: {}", e);
+                }
+            }
         }
 
         Ok(res)
-    }
-
-    pub async fn delete_article(&self, _ctx: Ctx, id: u64) -> Result<Article> {
-        let mut store = self.articles.lock().await;
-
-        if let Some(res) = store.remove_entry(&id) {
-            Ok(res.1)
-        } else {
-            Err(ArticleError::ArticleIdNotFound)
-        }
     }
 }
