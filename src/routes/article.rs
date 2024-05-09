@@ -8,11 +8,11 @@ use bson::oid::ObjectId;
 use crate::error::article_error::Result;
 use crate::models::article::{AddArticleRequest, Article, ArticleController};
 
-pub fn routes(mc: ArticleController) -> Router {
+pub fn routes(state: ArticleController) -> Router {
     Router::new()
         .route("/article", post(add_article))
         .route("/list", get(get_articles))
-        .with_state(mc)
+        .with_state(state)
 }
 
 async fn add_article(

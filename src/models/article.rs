@@ -3,6 +3,7 @@ use std::fmt::Display;
 use crate::error::article_error::{ArticleError, Result};
 use bson::{doc, oid::ObjectId, Document};
 use futures::StreamExt;
+use mongodb::Database;
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Deserialize, Serialize)]
@@ -43,12 +44,12 @@ pub struct AddArticleResponse {
 
 #[derive(Clone)]
 pub struct ArticleController {
-    db_instance: mongodb::Database,
+    db_instance: Database,
 }
 
 impl ArticleController {
-    pub async fn new(db_instance: mongodb::Database) -> Result<Self> {
-        Ok(Self { db_instance })
+    pub fn new(db_instance: Database) -> ArticleController {
+        ArticleController { db_instance }
     }
 
     pub async fn create_article(&self, req: AddArticleRequest) -> Result<ObjectId> {
