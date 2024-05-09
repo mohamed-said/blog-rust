@@ -19,7 +19,7 @@ async fn main() -> error::article_error::Result<()> {
     let routes_all = Router::new()
         //.merge(login::routes())
         //.nest("/api", routes_apis)
-        .merge(Router::new().route("/", get(foo)))
+        .merge(Router::new().route("/", get(root)))
         .merge(article::routes(article_controller))
         .layer(axum::middleware::map_response(main_response_mapper));
     //.layer(axum::middleware::from_fn(auth::mw_ctx_resolver))
@@ -39,6 +39,6 @@ async fn main_response_mapper(response: Response) -> Response {
     response
 }
 
-async fn foo() -> &'static str {
+async fn root() -> &'static str {
     "Hello world!"
 }
