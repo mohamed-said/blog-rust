@@ -1,4 +1,5 @@
 pub mod article;
+pub mod authentication;
 pub mod login;
 pub mod user;
 

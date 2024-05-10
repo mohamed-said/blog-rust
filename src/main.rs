@@ -19,10 +19,12 @@ async fn main() -> error::article_error::Result<()> {
 
     let article_apis = article::routes(article_controller);
     let user_apis = routes::user::routes(user_controller);
+    let auth_routes = routes::authentication::routes();
 
     let routes_all = Router::new()
         //.merge(login::routes())
         .merge(Router::new().route("/", get(root)))
+        .merge(auth_routes)
         .nest("/api", article_apis)
         .nest("/api", user_apis)
         .layer(axum::middleware::map_response(main_response_mapper));
@@ -37,7 +39,7 @@ async fn main() -> error::article_error::Result<()> {
 
 // TODO: complete this with a proper logging implementation
 async fn main_response_mapper(response: Response) -> Response {
-    println!("->> {}: main_response_mapper", "RES_MAPPER");
+    println!("->> RES_MAPPER: main_response_mapper");
     println!();
 
     response

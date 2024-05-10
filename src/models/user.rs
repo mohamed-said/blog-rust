@@ -6,16 +6,17 @@ use crate::error::user_error::{Result, UserError};
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct User {
-    _id: String,
-    name: String,
-    email: String,
-    phone: String,
+    pub _id: String,
+    pub name: String,
+    pub email: String,
+    pub phone: String,
 }
+
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct AddUserRequest {
-    name: String,
-    email: String,
-    phone: String,
+    pub name: String,
+    pub email: String,
+    pub phone: String,
 }
 
 #[derive(Clone)]

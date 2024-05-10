@@ -11,7 +11,7 @@ mongodb = "2.3"
 bson = { version = "2", features = ["chrono-0_4"] } # Needed for using chrono datetime in doc
 tokio = "1"
 chrono = "0.4" # Used for setting DateTimes
-serde = "1" # Used in the Map Data into Structs section
+serde = { version = "1", features = ["derive"] } # Used in the Map Data into Structs section
 futures = "0.3.28"
 futures-util = "0.3.30"
 serde_json = "1.0.116"
@@ -21,6 +21,7 @@ lazy-regex = "3.1.0"
 async-trait = "0.1.80"
 strum_macros = "0.26.2"
 uuid = { version = "1.8.0", features = [ "v4", "fast-rng", "macro-diagnostics" ] }
+jsonwebtoken = "9.3.0"
 
 [dev-dependencies]
 anyhow = "1.0.82"

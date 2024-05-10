@@ -8,6 +8,8 @@ use bson::oid::ObjectId;
 use crate::error::article_error::Result;
 use crate::models::article::{AddArticleRequest, Article, ArticleController};
 
+use super::authentication::{Auth, UserToken};
+
 pub fn routes(state: ArticleController) -> Router {
     Router::new()
         .route("/article", post(add_article))
@@ -16,6 +18,7 @@ pub fn routes(state: ArticleController) -> Router {
 }
 
 async fn add_article(
+    Auth(_user): Auth,
     State(mc): State<ArticleController>,
     Json(req): Json<AddArticleRequest>,
 ) -> Result<Json<ObjectId>> {
@@ -27,7 +30,7 @@ async fn add_article(
 }
 
 async fn get_articles(State(mc): State<ArticleController>) -> Result<Json<Vec<Article>>> {
-    println!("->> {:12} - {}", "HANDLER", "get_articles");
+    println!("->> {:12} - get_articles", "HANDLER");
 
     let articles = mc.list_articles().await?;
 
