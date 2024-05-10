@@ -12,6 +12,13 @@ The goal of this project is **completely educational**, feel free to use it howe
 ### I recommend using docker and docker compose to try the project, but feel free to use the other method as well.
 
 
+# Feature List
+* &#x2705; Add Article
+* &#x2705; Add User
+* &#x2705; View Articles
+* &#x23f3; Delete Article
+* &#x23f3; Authentication
+
 # Usage
 
 ## Docker
@@ -50,10 +57,3 @@ curl -X POST -H "Content-Type: application/json" -d '{
 ```
 curl http://localhost:3000/api/article
 ```
-
-# Feature List
-* &#x2705; Add Article
-* &#x2705; Add User
-* &#x2705; View Articles
-* &#x23f3; Delete Article
-* &#x23f3; Authentication
