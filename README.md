@@ -55,5 +55,5 @@ curl -X POST -H "Content-Type: application/json" -d '{
 
 ## View all existing articles
 ```
-curl http://localhost:3000/api/article
+curl http://localhost:3000/api/list
 ```
