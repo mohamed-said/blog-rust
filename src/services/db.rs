@@ -20,8 +20,8 @@ impl Database {
                 .unwrap();
 
         let client = Client::with_options(options).unwrap();
-        let db = client.database("blog-database");
+        
 
-        db
+        client.database("blog-database")
     }
 }

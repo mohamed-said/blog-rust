@@ -57,3 +57,21 @@ jobs:
       with:
         command:                 fmt
         toolchain:               stable
+
+  static-analysis:
+    runs-on:                     ubuntu-latest
+    name:                        Check style formatting
+
+    steps:
+    - name:                      Checkout sources & submodules
+      uses:                      actions/checkout@master
+      with:
+        fetch-depth:             5
+        submodules:              recursive
+
+    - name:                      Cippy
+      uses:                      actions-rs/cargo@master
+      with:
+        command:                 clippy
+        toolchain:               stable
+        args:                    --no-deps
