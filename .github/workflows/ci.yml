@@ -60,7 +60,7 @@ jobs:
 
   static-analysis:
     runs-on:                     ubuntu-latest
-    name:                        Check style formatting
+    name:                        Run static analysis
 
     steps:
     - name:                      Checkout sources & submodules
