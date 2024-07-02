@@ -40,3 +40,14 @@ jobs:
         command:                 build
         toolchain:               stable
         args:                    --all --verbose
+
+  fmt:
+    runs-on:                     ubuntu-latest
+    name:                        Check style formatting
+
+    steps:
+      - name:                    Checking code formatting
+        uses:                    actions-rs/cargo@master
+        with:
+          command:               fmt
+          toolchain:             stable
