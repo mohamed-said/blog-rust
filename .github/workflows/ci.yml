@@ -46,8 +46,14 @@ jobs:
     name:                        Check style formatting
 
     steps:
-      - name:                    Checking code formatting
-        uses:                    actions-rs/cargo@master
-        with:
-          command:               fmt
-          toolchain:             stable
+    - name:                      Checkout sources & submodules
+      uses:                      actions/checkout@master
+      with:
+        fetch-depth:             5
+        submodules:              recursive
+
+    - name:                      Checking code formatting
+      uses:                      actions-rs/cargo@master
+      with:
+        command:                 fmt
+        toolchain:               stable
