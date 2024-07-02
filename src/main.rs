@@ -6,7 +6,7 @@ pub mod services;
 use axum::{response::Response, routing::get, Router};
 use models::{article::ArticleController, user::UserController};
 use routes::article;
-use tokio;
+
 
 #[tokio::main]
 async fn main() -> error::article_error::Result<()> {
@@ -32,7 +32,7 @@ async fn main() -> error::article_error::Result<()> {
 
 // TODO: complete this with a proper logging implementation
 async fn main_response_mapper(response: Response) -> Response {
-    println!("->> {}: main_response_mapper", "RES_MAPPER");
+    println!("->> RES_MAPPER: main_response_mapper");
     println!();
 
     response

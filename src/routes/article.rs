@@ -19,7 +19,7 @@ async fn add_article(
     State(mc): State<ArticleController>,
     Json(req): Json<AddArticleRequest>,
 ) -> Result<Json<ObjectId>> {
-    println!("->> {:12} - {}", "HANDLER", "add_article");
+    println!("->> {:12} - add_article", "HANDLER");
 
     let added_object_id = mc.create_article(req).await?;
 
@@ -27,7 +27,7 @@ async fn add_article(
 }
 
 async fn get_articles(State(mc): State<ArticleController>) -> Result<Json<Vec<Article>>> {
-    println!("->> {:12} - {}", "HANDLER", "get_articles");
+    println!("->> {:12} - get_articles", "HANDLER");
 
     let articles = mc.list_articles().await?;
 
