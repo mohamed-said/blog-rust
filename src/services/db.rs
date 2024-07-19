@@ -14,13 +14,15 @@ impl Database {
             Err(_) => String::from("mongodb://localhost:27017/?directConnection=true"),
         };
 
+        eprintln!("[DEBUG][DATABASE]: client_uri: {}", client_uri);
+
         let options =
             ClientOptions::parse_with_resolver_config(&client_uri, ResolverConfig::cloudflare())
                 .await
                 .unwrap();
 
         let client = Client::with_options(options).unwrap();
-        
+
 
         client.database("blog-database")
     }
